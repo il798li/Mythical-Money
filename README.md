@@ -1,2 +1,3 @@
-Fork this bot into your own code. things to change: <br>
-Reset all JSON files to just be {}. However, I would recommend keeping the Blacklisted.json, as these people have been blacklisted for a reason.
+Feel free to fork this code into your own bot. Be sure to follow the steps below to ensure it works properly! <br>
+- Reset all JSON files to just be {}. However, I would recommend keeping the Blacklisted.json, as these people have been blacklisted for a reason. <br>
+- Update the `Token.txt` file with your bot's token.
