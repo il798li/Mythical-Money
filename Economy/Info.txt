@@ -1,0 +1,183 @@
+import Main
+@ Main.commands.command (
+	name = 'info' ,
+	aliases = [
+		'information'
+	] ,
+	description = 'Item Info'
+)
+
+@Main.commands.is_owner()
+async def info(
+	ctx,
+	*,
+	item = ''
+):
+
+	prefix = Main.discord.utils.escape_markdown(
+		ctx.prefix
+	)
+
+	if item.lower() not in Main.storage.craftables :
+
+		return await Main.deletable(
+			ctx,
+			Main.embed(
+				ctx,
+				'Item Info Error',
+				'You must specify a valid item to view its info! You can find item names by running \'__' + prefix + 'usage <item>__!\''
+			),
+			deletable = True
+		)
+	item_ = Main.storage.craftables[
+		item
+	]
+	destination_ = item_ [
+		'destination'
+	]
+	class destination:
+		category = destination_[
+			0
+		]
+		section = destination_[
+			1
+		]
+	name = item_[
+		'name'
+	]
+	chances = item_[
+		'chances'
+	]
+	chances_ = Main.toClass (
+		chances
+	)
+	sum = 0
+	for item in chances:
+		sum += chances[
+			item
+		]
+	class new :
+		pass
+	def getDataAtIndex(
+		index : int = 0 ,
+		dictionary : dict = chances
+	) :
+		key_ = list(
+			dictionary.keys()
+		) [
+			index
+		]
+		class data:
+			key = key_
+		data.value = dictionary [
+			key_
+		]
+		return data
+	content = {}
+	content [
+		'Recipe'
+	] = 'The ' + name + ' requires {:,} {} to craft.'.format(
+		getDataAtIndex(
+			dictionary = item_[
+				'recipe'
+			]
+		).value,
+		Main.storage.shop [
+			getDataAtIndex (
+				dictionary = item_ [
+					'recipe'
+				]
+			).key
+		] [
+			'plural'
+		]
+	)
+	if destination.category == 'armor':
+		content [
+			'Defense'
+		] = 'The ' + item.title () + ' aborbs {}% of dealt damage.'.format (
+			(
+				1 - item_ [
+					'defense'
+				]
+			) * 100
+		)
+		content [
+			'Health'
+		] = 'The ' + item.title () + 'grants an additional {} Health when worn.'.format (
+			item_ [
+				'health'
+			]
+		)
+		return await Main.deletable (
+			ctx ,
+			Main.embed (
+				ctx ,
+				content
+			) ,
+			deletable = True
+		)
+	if destination.category == 'tools' :
+		action = 'farm' if destination.section == 'hoe' else 'kill' if destination.section == 'weapon' else 'mine' if destination.section == 'pickaxe' else 'chop'
+		target = 'crops' if action == 'farm' else 'monsters' if action == 'kill' else 'ores' if action == 'mine' else 'woods'
+		new.chances = 'The ' + name + ' has a {}% chance to ' + action + ' 1 {}, a {}% chance to ' + action + ' 1 {}, a {}% chance to ' + action + ' 1 {}, and a {}% chance to ' + action + ' 1 {}. These chances are reapplied based on how many monsters this weapon can kill at once.'
+		new.chances = new.chances.format (
+			getDataAtIndex(
+				0
+			).value / sum * 100,
+			getDataAtIndex(
+				0
+			).key.title (),
+			getDataAtIndex(
+				1
+			).value / sum * 100,
+			getDataAtIndex(
+				1
+			).key.title (),
+			getDataAtIndex(
+				2
+			).value / sum * 100,
+			getDataAtIndex(
+				2
+			).key.title (),
+			getDataAtIndex(
+				3
+			).value / sum * 100,
+			getDataAtIndex(
+				3
+			).key.title (),
+		)
+	content [
+		'Chances'
+	] = new.chances
+	if destination.section == 'weapon' :
+		content [
+			'Damage'
+		] = 'The ' + name + ' deals {} damage per hit.'.format (
+			item_ [
+				'damage'
+			]
+		)
+    content[
+        'f'
+    ] = 'hi'
+	content [
+		'Recipe'
+	] = 'The ' + name + ' requires {:,} {} to craft.'.format (
+		getDataAtIndex(dictionary = item_['recipe']).value,
+		Main.storage.shop[getDataAtIndex(dictionary = item_['recipe']).key]['plural']
+	)
+	await Main.deletable (
+		ctx ,
+		Main.embed (
+			ctx ,
+			content
+		) ,
+		deletable = True
+	)
+def setup(
+	mm
+):
+	mm.add_command(
+		info
+	)
